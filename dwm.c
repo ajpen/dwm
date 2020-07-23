@@ -130,6 +130,7 @@ struct Monitor {
 	Client *stack;
 	Monitor *next;
 	Window barwin;
+	int curlayout;
 	const Layout *lt[2];
 };
 
@@ -201,6 +202,7 @@ static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
 static void setgaps(const Arg *arg);
+static void togglelayout(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
@@ -641,6 +643,7 @@ createmon(void)
 	m->showbar = showbar;
 	m->topbar = topbar;
 	m->gappx = gappx;
+	m->curlayout = 0;
 	m->lt[0] = &layouts[0];
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
@@ -1515,6 +1518,15 @@ setgaps(const Arg *arg)
 	else
 		selmon->gappx += arg->i;
 	arrange(selmon);
+}
+
+
+void
+togglelayout(const Arg *arg)
+{
+	selmon->curlayout = (selmon->curlayout + 1) % 3;
+	Arg layout = {.v = &layouts[selmon->curlayout]};
+	setlayout(&layout);
 }
 
 void
